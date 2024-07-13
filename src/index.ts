@@ -7,10 +7,14 @@ const debug = createDebug('app:index');
   debug('Booting');
 
   await sequenteInitialization(
-    defineSequente('Inject env variables to process', async () => {
-      const { config } = await import('dotenv');
-      config({ path: '.env.dev' });
-    }),
+    defineSequente(
+      'Inject env variables to process',
+      async () => {
+        const { config } = await import('dotenv');
+        config({ path: '.env.dev' });
+      },
+      () => process.env.NDOE_ENV === 'dev',
+    ),
 
     defineSequente(
       'Discord client',
