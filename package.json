@@ -4,6 +4,7 @@
     "dev": "DEBUG=app* DEBUG_COLORS=1 ts-node-dev --respawn --transpile-only src"
   },
   "dependencies": {
+    "date-fns": "^3.6.0",
     "debug": "^4.3.5",
     "discord.js": "^14.15.3",
     "dotenv": "^16.4.5",
