@@ -4,7 +4,7 @@ import { sequenteInitialization, defineSequente } from './utils/sequente';
 const debug = createDebug('app:index');
 
 (async () => {
-  debug('Booting');
+  debug('Booting environment %s', process.env.NODE_ENV);
 
   await sequenteInitialization(
     defineSequente(
@@ -13,7 +13,7 @@ const debug = createDebug('app:index');
         const { config } = await import('dotenv');
         config({ path: '.env.dev' });
       },
-      () => process.env.NDOE_ENV === 'dev',
+      () => process.env.NODE_ENV === 'dev',
     ),
 
     defineSequente(
