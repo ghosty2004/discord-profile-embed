@@ -1,5 +1,5 @@
 import express from 'express';
-import { renderToString } from 'react-dom/server';
+import { renderToPipeableStream } from 'react-dom/server';
 import createDebug from 'debug';
 import { format } from 'date-fns';
 import App from '../components/App';
@@ -12,10 +12,7 @@ import {
   fetchUserProfile,
 } from '../natives/discord';
 import { ExpectedAny } from '../types';
-import {
-  addDataUriPrefix,
-  convertClassToTailwindInlineStyle,
-} from '../utils/misc';
+import { addDataUriPrefix } from '../utils/misc';
 import { ActivityType } from 'discord.js';
 import { SpotifyActivity } from '../components/activities/Spotify';
 
@@ -23,8 +20,14 @@ const debug = createDebug('app:apps:express-api');
 
 const app = express();
 
+app.get('/favicon.ico', (req, res) => {
+  res.status(204);
+});
+
 app.get('/:userId', async ({ params: { userId } }, res) => {
   try {
+    debug('Fetching user %s', userId);
+
     const member = await fetchMember(userId);
 
     if (!member.presence)
@@ -34,6 +37,8 @@ app.get('/:userId', async ({ params: { userId } }, res) => {
       fetchUserProfile(member.user.id),
       fetchUserAssets(member.user.id),
     ]);
+
+    debug('User profile fetched for %s', member.user.username);
 
     if (!userProfile)
       return res.send("Cannot fetch user's profile").status(404);
@@ -51,6 +56,8 @@ app.get('/:userId', async ({ params: { userId } }, res) => {
       badgesToBase64DataUriFromUserProfile(userProfile),
       extractBioWithEmojisToNode(userProfile.user_profile.bio),
     ]);
+
+    debug('User assets fetched for %s', member.user.username);
 
     const currentActivity = await (async () => {
       const activity = member?.presence?.activities?.[0];
@@ -93,35 +100,39 @@ app.get('/:userId', async ({ params: { userId } }, res) => {
       }
     })();
 
-    const html = convertClassToTailwindInlineStyle(
-      renderToString(
-        App({
-          username: member.user.username,
-          globalName: userProfile.user.global_name,
-          pronouns: userProfile.user_profile.pronouns,
-          status: member.presence?.status,
-          bio: userBioAsNode,
-          ...(avatarAsBase64Str && {
-            avatarDataUri: addDataUriPrefix(avatarAsBase64Str, 'image/png'),
-          }),
-          ...(bannerAsBase64Str && {
-            bannerDataUri: addDataUriPrefix(bannerAsBase64Str, 'image/png'),
-          }),
-          ...(decorationAsBase64Str && {
-            avatarDecorationDataUri: addDataUriPrefix(
-              decorationAsBase64Str,
-              'image/png',
-            ),
-          }),
-          badgeDataUris: userBadgesAsDataUris,
-          currentActivity,
-        }),
-      ),
-    );
+    debug('User activity fetched for %s', member.user.username);
 
-    res.status(200);
-    res.setHeader('Content-Type', 'image/svg+xml');
-    res.send(html);
+    const stream = renderToPipeableStream(
+      App({
+        username: member.user.username,
+        globalName: userProfile.user.global_name,
+        pronouns: userProfile.user_profile.pronouns,
+        status: member.presence?.status,
+        bio: userBioAsNode,
+        ...(avatarAsBase64Str && {
+          avatarDataUri: addDataUriPrefix(avatarAsBase64Str, 'image/png'),
+        }),
+        ...(bannerAsBase64Str && {
+          bannerDataUri: addDataUriPrefix(bannerAsBase64Str, 'image/png'),
+        }),
+        ...(decorationAsBase64Str && {
+          avatarDecorationDataUri: addDataUriPrefix(
+            decorationAsBase64Str,
+            'image/png',
+          ),
+        }),
+        badgeDataUris: userBadgesAsDataUris,
+        currentActivity,
+      }),
+      {
+        onShellReady() {
+          res.status(200);
+          res.setHeader('Content-Type', 'image/svg+xml');
+          stream.pipe(res as any);
+          debug("User %s's profile rendered", member.user.username);
+        },
+      },
+    );
   } catch (err: ExpectedAny) {
     if ('rawError' in err) {
       res.send(err.rawError.message);
