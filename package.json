@@ -1,7 +1,8 @@
 {
   "scripts": {
-    "start": "DEBUG=app* DEBUG_COLORS=1 ts-node src",
-    "dev": "DEBUG=app* DEBUG_COLORS=1 ts-node-dev --respawn --transpile-only src"
+    "start": "NODE_ENV=prod DEBUG=app* node dist/src/index.js",
+    "dev": "NODE_ENV=dev DEBUG=app* DEBUG_COLORS=1 ts-node-dev --respawn --transpile-only src",
+    "build": "rimraf dist && tsc"
   },
   "dependencies": {
     "date-fns": "^3.6.0",
@@ -21,6 +22,7 @@
     "@types/express": "^4.17.21",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
+    "rimraf": "^6.0.1",
     "tailwindcss": "^3.4.4",
     "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0"
