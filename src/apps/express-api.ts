@@ -2,7 +2,12 @@ import express from 'express';
 import { renderToString } from 'react-dom/server';
 import createDebug from 'debug';
 import App from '../components/App';
-import { fetchUser, fetchUserAssetToBase64 } from '../natives/discord';
+import {
+  fetchMember,
+  fetchUserAssets,
+  fetchUserAssetToBase64,
+  getUserBadgesAsDataUri,
+} from '../natives/discord';
 import { ExpectedAny } from '../types';
 import {
   addDataUriPrefix,
@@ -15,26 +20,43 @@ const app = express();
 
 app.get('/:userId', async ({ params: { userId } }, res) => {
   try {
-    const user = await fetchUser(userId);
+    const member = await fetchMember(userId);
 
-    console.log(user.avatarDecorationURL());
+    console.log(member.premiumSince);
 
-    const [avatarAsBase64Str, bannerAsBase64Str] = await Promise.all([
-      fetchUserAssetToBase64(user, 'avatar'),
-      fetchUserAssetToBase64(user, 'banner'),
+    if (!member.presence)
+      return res.send('Cannot fetch member presence').status(404);
+
+    const [userAssets, userBadgesAsDataUris] = await Promise.all([
+      fetchUserAssets(member.user.id),
+      getUserBadgesAsDataUri(member.user),
     ]);
 
-    debug('User: %o', user);
+    const [avatarAsBase64Str, bannerAsBase64Str, decorationAsBase64Str] =
+      await Promise.all([
+        fetchUserAssetToBase64(userAssets.avatarUri),
+        fetchUserAssetToBase64(userAssets.bannerUri),
+        fetchUserAssetToBase64(userAssets.decorationUri),
+      ]);
 
     const html = convertClassToTailwindInlineStyle(
       renderToString(
         App({
-          username: user.username,
-          status: 'Idk',
-          avatarDataUri: addDataUriPrefix(avatarAsBase64Str, 'image/png'),
+          username: member.user.username,
+          status: member.presence?.status,
+          ...(avatarAsBase64Str && {
+            avatarDataUri: addDataUriPrefix(avatarAsBase64Str, 'image/png'),
+          }),
           ...(bannerAsBase64Str && {
             bannerDataUri: addDataUriPrefix(bannerAsBase64Str, 'image/png'),
           }),
+          ...(decorationAsBase64Str && {
+            avatarDecorationDataUri: addDataUriPrefix(
+              decorationAsBase64Str,
+              'image/png',
+            ),
+          }),
+          badgeDataUris: userBadgesAsDataUris,
         }),
       ),
     );

@@ -9,6 +9,7 @@ const client = new Client({
     'GuildMessages',
     'DirectMessages',
     'MessageContent',
+    'GuildPresences',
   ],
 });
 

@@ -4,3 +4,4 @@ export type ExpectedFunction = (...args: any[]) => any;
 export type ExpectedStr = string;
 export type ExpectedInt = number;
 export type ExpectedBoolean = boolean;
+export type ExpectedNull = null;
