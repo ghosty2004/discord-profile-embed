@@ -128,6 +128,7 @@ app.get('/:userId', async ({ params: { userId } }, res) => {
         onShellReady() {
           res.status(200);
           res.setHeader('Content-Type', 'image/svg+xml');
+          res.setHeader('Cache-Control', 'public, max-age=0, must-revalidate');
           stream.pipe(res as any);
           debug("User %s's profile rendered", member.user.username);
         },
