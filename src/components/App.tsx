@@ -5,6 +5,7 @@ import { FaMoon } from 'react-icons/fa';
 import { GoDotFill } from 'react-icons/go';
 import { twj } from '../utils/tailwind-to-css';
 import { Spotify, SpotifyActivity } from './activities/Spotify';
+import { Game, GameActivity } from './activities/Game';
 import { TBioNode } from '../types';
 
 interface IProps {
@@ -17,10 +18,10 @@ interface IProps {
   bannerDataUri?: string;
   avatarDecorationDataUri?: string;
   badgeDataUris: string[];
-  currentActivity?: SpotifyActivity;
+  currentActivity?: SpotifyActivity | GameActivity;
 }
 
-const DEFAULT_WIDTH = 310;
+const DEFAULT_WIDTH = 350;
 const DEFAULT_HEIGHT = 520;
 
 const App = ({
@@ -180,6 +181,8 @@ const App = ({
               <div style={twj('rounded-md p-2 bg-[#121315]')}>
                 {currentActivity instanceof SpotifyActivity ? (
                   <Spotify {...currentActivity} />
+                ) : currentActivity instanceof GameActivity ? (
+                  <Game {...currentActivity} />
                 ) : null}
               </div>
             ) : null}
