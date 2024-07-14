@@ -1,4 +1,3 @@
-import { twi } from '../utils/tailwind-to-css';
 import { ExpectedStr } from '../types';
 
 export const addDataUriPrefix = <
