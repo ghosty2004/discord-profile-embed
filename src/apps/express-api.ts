@@ -15,6 +15,7 @@ import { ExpectedAny } from '../types';
 import { addDataUriPrefix } from '../utils/misc';
 import { ActivityType } from 'discord.js';
 import { SpotifyActivity } from '../components/activities/Spotify';
+import { GameActivity } from '../components/activities/Game';
 
 const debug = createDebug('app:apps:express-api');
 
@@ -96,6 +97,30 @@ app.get('/:userId', async ({ params: { userId } }, res) => {
             elapsed,
             totalDuration,
             progress,
+          });
+        case ActivityType.Playing:
+          return new GameActivity({
+            largeImageDataUri: addDataUriPrefix(
+              (await fetchUserAssetToBase64(
+                activity.assets!.largeImageURL({ extension: 'png', size: 16 }),
+              ))!,
+              'image/png',
+            ),
+            smallImageDataUri: addDataUriPrefix(
+              (await fetchUserAssetToBase64(
+                activity.assets!.smallImageURL({ extension: 'png', size: 16 }),
+              ))!,
+              'image/png',
+            ),
+            name: activity.name!,
+            details: activity.details!,
+            state: activity.state!,
+            elapsed: format(
+              new Date(
+                new Date().getTime() - activity.timestamps!.start!.getTime(),
+              ),
+              'm:ss',
+            ),
           });
       }
     })();
