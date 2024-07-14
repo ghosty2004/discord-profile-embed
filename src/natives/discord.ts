@@ -1,7 +1,7 @@
 import { Readable } from 'node:stream';
 import { readFile } from 'node:fs/promises';
 import client from '../apps/discord-client';
-import { ExpectedAny, ExpectedNull, ExpectedStr, TBioNode } from '../types';
+import { ExpectedNull, ExpectedStr, TBioNode } from '../types';
 import { makeIterableFromReader } from '../utils/generators';
 import { IUserAssets, IUserProfile } from '../interface';
 import { User } from 'discord.js';
@@ -75,6 +75,15 @@ export const getUserBadgesAsDataUri = async (
       .filter(Boolean),
   )) as string[];
 };
+
+export const fetchProfileEffects = () =>
+  fetch('https://discord.com/api/v9/user-profile-effects', {
+    headers: {
+      authorization: process.env.CLIENT_TOKEN!,
+    },
+  })
+    .then((res) => res.json())
+    .then(({ profile_effect_configs }) => profile_effect_configs);
 
 export const fetchUserProfile = async (
   userId: ExpectedStr,
