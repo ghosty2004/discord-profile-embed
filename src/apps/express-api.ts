@@ -32,9 +32,6 @@ app.get('/:userId', async ({ params: { userId } }, res) => {
 
     const member = await fetchMember(userId);
 
-    if (!member.presence)
-      return res.send('Cannot fetch member presence').status(404);
-
     const [userProfile, userAssets] = await Promise.all([
       fetchUserProfile(member.user.id),
       fetchUserAssets(member.user.id),
@@ -141,7 +138,7 @@ app.get('/:userId', async ({ params: { userId } }, res) => {
         username: member.user.username,
         globalName: userProfile.user.global_name,
         pronouns: userProfile.user_profile.pronouns,
-        status: member.presence?.status,
+        status: member.presence?.status || 'offline',
         bio: userBioAsNode,
         ...(avatarAsBase64Str && {
           avatarDataUri: addDataUriPrefix(avatarAsBase64Str, 'image/png'),

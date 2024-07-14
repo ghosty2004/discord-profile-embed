@@ -23,7 +23,7 @@ interface IProps {
 }
 
 const DEFAULT_WIDTH = 350;
-const DEFAULT_HEIGHT = 510;
+const DEFAULT_HEIGHT = 310;
 
 const App = ({
   username,
@@ -38,7 +38,18 @@ const App = ({
   badgeDataUris,
   currentActivity,
 }: IProps) => {
-  const height = !currentActivity ? DEFAULT_HEIGHT - 140 : DEFAULT_HEIGHT;
+  const haveBio = bio.filter((f) => f.length > 0).length > 0;
+  const haveActivity = !!currentActivity;
+
+  let height = DEFAULT_HEIGHT;
+
+  if (haveBio) {
+    height += 100;
+  }
+
+  if (haveActivity) {
+    height += 100;
+  }
 
   return (
     <svg
@@ -91,9 +102,9 @@ const App = ({
                   src={avatarDataUri}
                   alt="avatar"
                   style={twj(
-                    `rounded-full w-[76px] h-[76px] border-[2px] ${
+                    `rounded-full w-[76px] h-[76px] border-[4px] ${
                       !avatarDecorationDataUri
-                        ? 'border-solid border-white'
+                        ? 'border-solid border-[#121315]'
                         : ''
                     }`,
                   )}
@@ -105,31 +116,44 @@ const App = ({
                     style={twj('absolute inset-0 w-full h-full')}
                   />
                 )}
-                <div style={twj('absolute bottom-[2px] right-[10px]')}>
+                <div
+                  style={twj('absolute bottom-0 right-[2px] flex items-end')}
+                >
                   {status === 'dnd' ? (
                     <MdDoNotDisturbOn
-                      width={10}
-                      height={10}
                       style={twj(
-                        'text-red-500 bg-[#1a1c1f] p-[2px] rounded-full',
+                        'w-[14px] h-[14px] text-red-500 bg-[#121315] border-solid border-[#121315] border-[2px] mt-[3px] rounded-full',
                       )}
                     />
                   ) : status === 'online' ? (
                     <div
-                      style={twj('w-[10px] h-[10px] bg-green-500 rounded-full')}
+                      style={twj(
+                        'w-[10px] h-[10px] bg-green-500 border-solid border-[#121315] border-[3px] rounded-full',
+                      )}
                     />
                   ) : status === 'idle' ? (
                     <FaMoon
-                      width={10}
-                      height={10}
                       style={twj(
-                        'text-yellow-500 bg-[#1a1c1f] p-[2px] rounded-full',
+                        'w-[14px] h-[14px] text-yellow-500 bg-[#121315] border-solid border-[#121315] border-[2px] mt-[3px] rounded-full',
                       )}
                     />
                   ) : (
                     <div
-                      style={twj('w-[10px] h-[10px] bg-gray-500 rounded-full')}
-                    />
+                      style={twj(
+                        'relative w-[10px] h-[10px] bg-gray-500 border-solid border-[#121315] border-[3px] rounded-full',
+                      )}
+                    >
+                      <div
+                        style={{
+                          ...twj(
+                            'absolute bg-[#121315] p-[2.5px] rounded-full',
+                          ),
+                          top: '50%',
+                          left: '50%',
+                          transform: 'translate(-50%, -50%)',
+                        }}
+                      />
+                    </div>
                   )}
                 </div>
               </div>
@@ -153,40 +177,52 @@ const App = ({
 
           <div style={twj('flex flex-col mx-2 gap-5')}>
             <div style={twj('flex flex-col gap-1 rounded-md p-2 bg-[#121315]')}>
-              <p style={twj('text-xl font-bold m-0 p-0')}>{globalName}</p>
+              <p style={twj('text-xl font-bold m-0 p-0')}>
+                {globalName || username}
+              </p>
               <div style={twj('flex items-center gap-1')}>
                 <p style={twj('text-sm m-0 p-0')}>{username}</p>
-                <GoDotFill style={twj('text-xs')} />
-                <p style={twj('text-sm text-white/80 m-0 p-0')}>{pronouns}</p>
+                {pronouns && (
+                  <>
+                    <GoDotFill style={twj('text-xs')} />
+                    <p style={twj('text-sm text-white/80 m-0 p-0')}>
+                      {pronouns}
+                    </p>
+                  </>
+                )}
               </div>
             </div>
 
-            <div style={twj('flex flex-col rounded-md p-2 gap-2 bg-[#121315]')}>
-              <p style={twj('p-0 m-0 text-sm text-white/90 font-semibold')}>
-                About Me
-              </p>
+            {haveBio && (
+              <div
+                style={twj('flex flex-col rounded-md p-2 gap-2 bg-[#121315]')}
+              >
+                <p style={twj('p-0 m-0 text-sm text-white/90 font-semibold')}>
+                  About Me
+                </p>
 
-              {bio.map((line, index) => (
-                <div key={index} style={twj('flex flex-row')}>
-                  {line.map((node, index) =>
-                    node.type === 'char' ? (
-                      <p key={index} style={twj('m-0 p-0')}>
-                        {node.value}
-                      </p>
-                    ) : (
-                      <img
-                        key={index}
-                        src={node.value}
-                        alt="emoji"
-                        style={twj('w-[20px] h-[20px]')}
-                      />
-                    ),
-                  )}
-                </div>
-              ))}
-            </div>
+                {bio.map((line, index) => (
+                  <div key={index} style={twj('flex flex-row')}>
+                    {line.map((node, index) =>
+                      node.type === 'char' ? (
+                        <p key={index} style={twj('m-0 p-0')}>
+                          {node.value}
+                        </p>
+                      ) : (
+                        <img
+                          key={index}
+                          src={node.value}
+                          alt="emoji"
+                          style={twj('w-[20px] h-[20px]')}
+                        />
+                      ),
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
 
-            {currentActivity ? (
+            {haveActivity ? (
               <div style={twj('rounded-md p-2 bg-[#121315]')}>
                 {currentActivity instanceof SpotifyActivity ? (
                   <Spotify {...currentActivity} />
