@@ -184,6 +184,8 @@ app.get('/:userId', async ({ params: { userId } }, res) => {
   }
 });
 
-app.listen(3000, () => {
-  debug('Listening on port 3000');
+const LISTEN_PORT = Number(process.env.LISTEN_PORT) || 3000;
+
+app.listen(LISTEN_PORT, () => {
+  debug('Listening on port %d', LISTEN_PORT);
 });
