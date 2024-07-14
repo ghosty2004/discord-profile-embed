@@ -140,6 +140,9 @@ app.get('/:userId', async ({ params: { userId } }, res) => {
         pronouns: userProfile.user_profile.pronouns,
         status: member.presence?.status || 'offline',
         bio: userBioAsNode,
+        ...(userProfile.user.banner_color && {
+          bannerColor: userProfile.user.banner_color,
+        }),
         ...(avatarAsBase64Str && {
           avatarDataUri: addDataUriPrefix(avatarAsBase64Str, 'image/png'),
         }),

@@ -14,6 +14,7 @@ interface IProps {
   pronouns: string;
   status: PresenceStatus;
   bio: TBioNode;
+  bannerColor?: any;
   avatarDataUri?: string;
   bannerDataUri?: string;
   avatarDecorationDataUri?: string;
@@ -31,6 +32,7 @@ const App = ({
   pronouns,
   status,
   bio,
+  bannerColor,
   avatarDataUri,
   bannerDataUri,
   avatarDecorationDataUri,
@@ -80,7 +82,13 @@ const App = ({
                 style={twj('w-full h-full object-fill rounded-t-[10px]')}
               />
             ) : (
-              <div style={twj('w-full h-full bg-gray-500 rounded-t-[10px]')} />
+              <div
+                style={twj(
+                  `w-full h-full bg-[${
+                    bannerColor || 'gray-500'
+                  }] rounded-t-[10px]`,
+                )}
+              />
             )}
 
             {profileEffectDataUri && (
