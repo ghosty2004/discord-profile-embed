@@ -76,7 +76,8 @@ const App = ({
               <img
                 src={profileEffectDataUri}
                 alt="profile-effect"
-                style={twj('absolute w-full rounded-[10px]')}
+                height={DEFAULT_HEIGHT}
+                style={twj('absolute w-full object-fill rounded-[10px]')}
               />
             )}
 
