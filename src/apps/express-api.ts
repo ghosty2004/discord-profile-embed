@@ -16,6 +16,7 @@ import { addDataUriPrefix } from '../utils/misc';
 import { ActivityType } from 'discord.js';
 import { SpotifyActivity } from '../components/activities/Spotify';
 import { GameActivity } from '../components/activities/Game';
+import { profileEffectsCache } from './cacher';
 
 const debug = createDebug('app:apps:express-api');
 
@@ -48,12 +49,20 @@ app.get('/:userId', async ({ params: { userId } }, res) => {
       avatarAsBase64Str,
       bannerAsBase64Str,
       decorationAsBase64Str,
+      profileEffectAsBase64Str,
       userBadgesAsDataUris,
       userBioAsNode,
     ] = await Promise.all([
       fetchUserAssetToBase64(userAssets.avatarUri),
       fetchUserAssetToBase64(userAssets.bannerUri),
       fetchUserAssetToBase64(userAssets.decorationUri),
+      userProfile.user_profile.profile_effect?.id
+        ? fetchUserAssetToBase64(
+            profileEffectsCache.get(
+              userProfile.user_profile.profile_effect?.id,
+            )!,
+          )
+        : undefined,
       badgesToBase64DataUriFromUserProfile(userProfile),
       extractBioWithEmojisToNode(userProfile.user_profile.bio),
     ]);
@@ -143,6 +152,12 @@ app.get('/:userId', async ({ params: { userId } }, res) => {
         ...(decorationAsBase64Str && {
           avatarDecorationDataUri: addDataUriPrefix(
             decorationAsBase64Str,
+            'image/png',
+          ),
+        }),
+        ...(profileEffectAsBase64Str && {
+          profileEffectDataUri: addDataUriPrefix(
+            profileEffectAsBase64Str,
             'image/png',
           ),
         }),

@@ -17,12 +17,13 @@ interface IProps {
   avatarDataUri?: string;
   bannerDataUri?: string;
   avatarDecorationDataUri?: string;
+  profileEffectDataUri?: string;
   badgeDataUris: string[];
   currentActivity?: SpotifyActivity | GameActivity;
 }
 
 const DEFAULT_WIDTH = 350;
-const DEFAULT_HEIGHT = 520;
+const DEFAULT_HEIGHT = 510;
 
 const App = ({
   username,
@@ -33,6 +34,7 @@ const App = ({
   avatarDataUri,
   bannerDataUri,
   avatarDecorationDataUri,
+  profileEffectDataUri,
   badgeDataUris,
   currentActivity,
 }: IProps) => {
@@ -56,12 +58,10 @@ const App = ({
           // @ts-ignore
           xmlns="http://www.w3.org/1999/xhtml"
           style={twj(
-            `absolute w-[${DEFAULT_WIDTH - 10}px] h-[${
-              height - 10
-            }px] inset-0 bg-[#1a1c1f] font-default text-white text-[16px] flex flex-col rounded-[10px] gap-10`,
+            `absolute w-[${DEFAULT_WIDTH}px] h-[${height}px] inset-0 bg-[#1a1c1f] font-default text-white text-[16px] flex flex-col rounded-[10px] gap-10`,
           )}
         >
-          <div style={twj('h-[100px] relative flex flex-col gap-10')}>
+          <div style={twj('h-[100px] w-full relative flex flex-col gap-10')}>
             {bannerDataUri ? (
               <img
                 src={bannerDataUri}
@@ -70,6 +70,14 @@ const App = ({
               />
             ) : (
               <div style={twj('w-full h-full bg-gray-500 rounded-t-[10px]')} />
+            )}
+
+            {profileEffectDataUri && (
+              <img
+                src={profileEffectDataUri}
+                alt="profile-effect"
+                style={twj('absolute w-full rounded-[10px]')}
+              />
             )}
 
             <div
