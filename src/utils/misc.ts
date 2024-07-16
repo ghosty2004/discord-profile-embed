@@ -1,3 +1,4 @@
+import { format, intervalToDuration } from 'date-fns';
 import { ExpectedStr } from '../types';
 
 export const addDataUriPrefix = <
@@ -8,3 +9,14 @@ export const addDataUriPrefix = <
   mimeType: MimeType,
 ): `data:${MimeType};base64,${Base64Str}` =>
   `data:${mimeType};base64,${base64Str}`;
+
+export const formatElapsedTime = (startTime: Date) => {
+  const now = new Date();
+  const elapsedMilliseconds = now.getTime() - startTime.getTime();
+
+  const duration = intervalToDuration({ start: startTime, end: now });
+
+  const formatString = (duration?.hours || 0) > 0 ? 'H:mm:ss' : 'mm:ss';
+
+  return format(new Date(elapsedMilliseconds), formatString);
+};

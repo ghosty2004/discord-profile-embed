@@ -12,7 +12,7 @@ import {
   fetchUserProfile,
 } from '../natives/discord';
 import { ExpectedAny } from '../types';
-import { addDataUriPrefix } from '../utils/misc';
+import { addDataUriPrefix, formatElapsedTime } from '../utils/misc';
 import { ActivityType } from 'discord.js';
 import { SpotifyActivity } from '../components/activities/Spotify';
 import { GameActivity } from '../components/activities/Game';
@@ -121,12 +121,7 @@ app.get('/:userId', async ({ params: { userId } }, res) => {
             name: activity.name!,
             details: activity.details!,
             state: activity.state!,
-            elapsed: format(
-              new Date(
-                new Date().getTime() - activity.timestamps!.start!.getTime(),
-              ),
-              'm:ss',
-            ),
+            elapsed: formatElapsedTime(activity.timestamps!.start!),
           });
       }
     })();
