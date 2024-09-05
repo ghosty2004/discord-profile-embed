@@ -1,6 +1,6 @@
 # Discord Profile Embed
 
-Embed your discord profile to markdowns or html iframes tags
+Embed your discord profile to markdowns or html iframes/images tags
 
 ## Features which are displayed
 - Profile photo & banner
