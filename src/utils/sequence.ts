@@ -3,8 +3,8 @@ import createDebug from 'debug';
 
 const debug = createDebug('app:utils:sequence');
 
-export const sequenteInitialization = async (
-  ...sequences: ReturnType<typeof defineSequente>[]
+export const sequenceInitialization = async (
+  ...sequences: ReturnType<typeof defineSequence>[]
 ) => {
   for (const [index, { name, fn, runCondition }] of sequences.entries()) {
     if (!runCondition()) {
@@ -17,7 +17,7 @@ export const sequenteInitialization = async (
   }
 };
 
-export const defineSequente = (
+export const defineSequence = (
   name: string,
   fn: ExpectedFunction | ExpectedAsyncFunction,
   runCondition: () => boolean = () => true,
