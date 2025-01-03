@@ -1,5 +1,5 @@
 import createDebug from 'debug';
-import { sequenteInitialization, defineSequente } from './utils/sequente';
+import { sequenceInitialization, defineSequence } from './utils/sequence';
 import { ExpectedAny, ExpectedArray } from './types';
 
 const debug = createDebug('app:index');
@@ -7,8 +7,8 @@ const debug = createDebug('app:index');
 (async () => {
   debug('Booting environment %s', process.env.NODE_ENV);
 
-  await sequenteInitialization(
-    defineSequente(
+  await sequenceInitialization(
+    defineSequence(
       'Inject env variables to process',
       async () => {
         const { config } = await import('dotenv');
@@ -18,12 +18,12 @@ const debug = createDebug('app:index');
       () => process.env.NODE_ENV === 'dev',
     ),
 
-    defineSequente(
+    defineSequence(
       'Discord client',
       async () => await import('./apps/discord-client'),
     ),
 
-    defineSequente('Cacher', async () => {
+    defineSequence('Cacher', async () => {
       const { profileEffectsCache, addToCache } = await import('./apps/cacher');
       const { fetchProfileEffects } = await import('./natives/discord');
 
@@ -40,7 +40,7 @@ const debug = createDebug('app:index');
       }
     }),
 
-    defineSequente(
+    defineSequence(
       'Express app',
       async () => await import('./apps/express-api'),
     ),
